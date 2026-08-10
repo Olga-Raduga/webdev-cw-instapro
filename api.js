@@ -93,4 +93,21 @@ export function addPost({ token, description, imageUrl }) {
     return response.json();
   });
 }
+export function getUserPosts({ token, userId }) {
+  return fetch(`${postsHost}/user-posts/${userId}`, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Не удалось загрузить посты пользователя");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      return data.posts;
+    });
+}
 
