@@ -1,6 +1,7 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage } from "../index.js";
+import { dislikePost, likePost } from "../api.js";
+import { posts, goToPage, user } from "../index.js";
 export function renderPostsPageComponent({ appEl }) {
   const postsHtml = posts
     .map((post) => {
@@ -63,6 +64,34 @@ export function renderPostsPageComponent({ appEl }) {
       goToPage(USER_POSTS_PAGE, {
         userId: userEl.dataset.userId,
       });
+    });
+  }
+  for (const likeButton of document.querySelectorAll(".like-button")) {
+    likeButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!user) {
+        alert("Чтобы поставить лайк, войдите в аккаунт");
+        return;
+      }
+      const postId = likeButton.dataset.postId;
+      const post = posts.find((post) => post.id === postId);
+      if (!post) {
+        return;
+      }
+      const request = post.isLiked ? dislikePost : likePost;
+      request({
+        token: `Bearer ${user.token}`,
+        postId,
+      })
+        .then((updatedPost) => {
+          const postIndex = posts.findIndex((post) => post.id === postId);
+          posts[postIndex] = updatedPost;
+          renderPostsPageComponent({ appEl });
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("Не удалось изменить лайк");
+        });
     });
   }
 }
