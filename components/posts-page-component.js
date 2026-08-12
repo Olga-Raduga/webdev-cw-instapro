@@ -10,6 +10,19 @@ const escapeHtml = (value) => {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 };
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toLocaleString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 export function renderPostsPageComponent({ appEl }) {
   const postsHtml = posts
     .map((post) => {
@@ -19,7 +32,7 @@ export function renderPostsPageComponent({ appEl }) {
       const description = escapeHtml(post.description);
       const userId = escapeHtml(post.user.id);
       const postId = escapeHtml(post.id);
-      const createdAt = escapeHtml(post.createdAt);
+      const createdAt = escapeHtml(formatDate(post.createdAt));
 
 
       const likes = Array.isArray(post.likes) ? post.likes : [];
